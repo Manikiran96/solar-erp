@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-
+from .pdf_views import quotation_pdf
 from .views import (
     PricingRuleViewSet,
     QuotationViewSet
@@ -19,5 +19,9 @@ router.register(
 )
 
 urlpatterns = [
-    path("", include(router.urls))
+    path("", include(router.urls)),
+    path(
+    "quotation-pdf/<int:pk>/",
+    quotation_pdf
+)
 ]

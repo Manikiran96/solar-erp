@@ -9,7 +9,9 @@ from .serializers import (
     CustomerPaymentSerializer,
     InvoiceSerializer
 )
-
+from rest_framework.permissions import (
+    IsAuthenticated
+)
 
 class CustomerPaymentViewSet(
     viewsets.ModelViewSet
@@ -24,7 +26,7 @@ class CustomerPaymentViewSet(
     serializer_class = (
         CustomerPaymentSerializer
     )
-
+    permission_classes = [IsAuthenticated]
 
 class InvoiceViewSet(
     viewsets.ModelViewSet
@@ -39,3 +41,4 @@ class InvoiceViewSet(
     serializer_class = (
         InvoiceSerializer
     )
+    permission_classes = [IsAuthenticated]

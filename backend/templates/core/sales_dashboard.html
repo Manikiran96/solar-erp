@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sales Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fa;
+            padding: 30px;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 900px;
+            margin: auto;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2563eb;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            margin: 15px 0;
+        }
+
+        a {
+            text-decoration: none;
+            color: #2563eb;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        a:hover {
+            color: #1d4ed8;
+        }
+
+        .logout {
+            color: red;
+        }
+    </style>
+
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Sales Dashboard</h1>
+
+    <p>
+        Welcome,
+        <strong>{{ request.user.username }}</strong>
+    </p>
+
+    <ul>
+
+        <li>
+            /api/reports/sales-dashboard/
+                📊 View Sales Dashboard Report
+            </a>
+        </li>
+
+        <li>
+            /api/crm/leads/
+                👥 Manage Leads
+            </a>
+        </li>
+
+        <li>
+            /api/quotation/
+                📄 Manage Quotations
+            </a>
+        </li>
+
+        <li>
+            <a href="/api/customers/">
+                🏢 View Customers
+            </a>
+        </li>
+
+        <li>
+            /dashboard/management/
+                📈 Management Dashboard
+            </a>
+        </li>
+
+    </ul>
+
+    <hr>
+
+    /logout/
+        🚪 Logout
+    </a>
+
+</div>
+
+</body>
+</html>
+
