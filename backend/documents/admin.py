@@ -1,10 +1,20 @@
 from django.contrib import admin
-from .models import *
 
-# Register your models here.
-for model in list(globals().values()):
-    try:
-        if hasattr(model, "_meta"):
-            admin.site.register(model)
-    except Exception:
-        pass
+from .models import CustomerDocument
+
+
+@admin.register(CustomerDocument)
+class CustomerDocumentAdmin(
+    admin.ModelAdmin
+):
+
+    list_display = [
+        "customer",
+        "document_type",
+        "document_name",
+        "uploaded_at",
+    ]
+
+    search_fields = [
+        "document_name",
+    ]
