@@ -1,10 +1,35 @@
 from django.contrib import admin
-from .models import *
 
-# Register your models here.
-for model in list(globals().values()):
-    try:
-        if hasattr(model, "_meta"):
-            admin.site.register(model)
-    except Exception:
-        pass
+from .models import (
+    InventoryItem,
+    MaterialIssue
+)
+
+
+@admin.register(InventoryItem)
+class InventoryItemAdmin(admin.ModelAdmin):
+
+    list_display = [
+        "item_code",
+        "item_name",
+        "item_type",
+        "stock_quantity",
+        "reorder_level",
+    ]
+
+    search_fields = [
+        "item_code",
+        "item_name",
+    ]
+
+
+@admin.register(MaterialIssue)
+class MaterialIssueAdmin(admin.ModelAdmin):
+
+    list_display = [
+        "project",
+        "inventory_item",
+        "quantity_issued",
+        "issued_to",
+        "issued_date",
+    ]

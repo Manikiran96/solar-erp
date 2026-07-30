@@ -1,49 +1,119 @@
 from django.db import models
+
 from projects.models import Project
 
 
-class Supplier(models.Model):
-    supplier_name = models.CharField(max_length=200)
-    broker_name = models.CharField(max_length=200, blank=True, null=True)
-    gst_number = models.CharField(max_length=50, blank=True, null=True)
-    contact_person = models.CharField(max_length=200, blank=True, null=True)
-    mobile = models.CharField(max_length=20, blank=True, null=True)
+class InventoryItem(models.Model):
+
+    ITEM_TYPES = [
+        ("PANEL", "Solar Panel"),
+        ("INVERTER", "Inverter"),
+        ("BATTERY", "Battery"),
+        ("STRUCTURE", "Structure"),
+        ("CABLE", "Cable"),
+        ("OTHER", "Other"),
+    ]
+
+    item_code = models.CharField(
+        max_length=50,
+        unique=True
+    )
+
+    item_name = models.CharField(
+        max_length=255
+    )
+
+    item_type = models.CharField(
+        max_length=50,
+        choices=ITEM_TYPES
+    )
+
+    unit = models.CharField(
+        max_length=50,
+        default="NOS"
+    )
+
+    stock_quantity = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=0
+    )
+
+    reorder_level = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=0
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def save(self, *args, **kwargs):
+
+        if not self.item_code:
+
+            last_item = (
+                InventoryItem.objects
+                .order_by("-id")
+                .first()
+            )
+
+            next_id = (
+                last_item.id + 1
+                if last_item
+                else 1
+            )
+
+            self.item_code = (
+                f"ITEM{next_id:05d}"
+            )
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.supplier_name
+
+        return (
+            f"{self.item_code} - "
+            f"{self.item_name}"
+        )
 
 
-class StockReceipt(models.Model):
-    grn_number = models.CharField(max_length=100, unique=True)
-    invoice_number = models.CharField(max_length=100)
-    vehicle_number = models.CharField(max_length=50, blank=True, null=True)
-    received_date = models.DateField()
-    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name="receipts")
-    remarks = models.TextField(blank=True, null=True)
+class MaterialIssue(models.Model):
+
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE
+    )
+
+    inventory_item = models.ForeignKey(
+        InventoryItem,
+        on_delete=models.CASCADE
+    )
+
+    quantity_issued = models.DecimalField(
+        max_digits=12,
+        decimal_places=2
+    )
+
+    issued_to = models.CharField(
+        max_length=200
+    )
+
+    issued_date = models.DateField()
+
+    remarks = models.TextField(
+        blank=True,
+        null=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
 
     def __str__(self):
-        return self.grn_number
 
-
-class StockItem(models.Model):
-    receipt = models.ForeignKey(StockReceipt, on_delete=models.CASCADE, related_name="stock_items")
-    serial_number = models.CharField(max_length=100, unique=True)
-    material_name = models.CharField(max_length=200)
-    manufacturer = models.CharField(max_length=200, blank=True, null=True)
-    rating = models.CharField(max_length=100, blank=True, null=True)
-    quantity = models.IntegerField(default=1)
-    available_quantity = models.IntegerField(default=1)
-    assigned_quantity = models.IntegerField(default=0)
-
-    def __str__(self):
-        return self.serial_number
-
-
-class MaterialAllocation(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="material_allocations")
-    stock_item = models.ForeignKey(StockItem, on_delete=models.CASCADE, related_name="allocations")
-    quantity = models.IntegerField()
-    assigned_date = models.DateField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.project.project_id} - {self.stock_item.material_name}"
+        return (
+            f"{self.project.project_code} - "
+            f"{self.inventory_item.item_name}"
+        )
