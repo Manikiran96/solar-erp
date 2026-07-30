@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:17
+    container_name: solar_erp_db
+    environment:
+      POSTGRES_DB: solarerp
+      POSTGRES_USER: solaruser
+      POSTGRES_PASSWORD: solarpassword
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    build:
+      context: ./backend
+    container_name: solar_erp_backend
+    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    env_file:
+      - ./backend/.env.example
+
+volumes:
+  postgres_data:
