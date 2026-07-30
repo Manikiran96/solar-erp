@@ -6,6 +6,8 @@ class PricingRule(models.Model):
 
     PROJECT_TYPES = [
         ("RESIDENTIAL", "Residential"),
+        ("COMMERCIAL", "Commercial"),
+        ("GOVERNMENT", "Government"),
         ("INDUSTRIAL", "Industrial"),
         ("AGRICULTURAL", "Agricultural"),
     ]
