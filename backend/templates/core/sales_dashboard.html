@@ -1,107 +1,81 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Sales Dashboard</title>
+{% extends "base.html" %}
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f7fa;
-            padding: 30px;
-        }
+{% block content %}
 
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 900px;
-            margin: auto;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-        }
+<h2>Sales Dashboard</h2>
 
-        h1 {
-            color: #2563eb;
-        }
+<p class="text-muted">
+    Sales and marketing team dashboard.
+</p>
 
-        ul {
-            list-style: none;
-            padding: 0;
-        }
+<div class="row">
 
-        li {
-            margin: 15px 0;
-        }
+    <div class="col-md-3">
+        <div class="card card-box">
+            <div class="card-body">
+                <h5>Total Leads</h5>
+                <h3 id="total_leads">-</h3>
+            </div>
+        </div>
+    </div>
 
-        a {
-            text-decoration: none;
-            color: #2563eb;
-            font-size: 16px;
-            font-weight: bold;
-        }
+    <div class="col-md-3">
+        <div class="card card-box">
+            <div class="card-body">
+                <h5>Won Leads</h5>
+                <h3 id="won_leads">-</h3>
+            </div>
+        </div>
+    </div>
 
-        a:hover {
-            color: #1d4ed8;
-        }
+    <div class="col-md-3">
+        <div class="card card-box">
+            <div class="card-body">
+                <h5>Lost Leads</h5>
+                <h3 id="lost_leads">-</h3>
+            </div>
+        </div>
+    </div>
 
-        .logout {
-            color: red;
-        }
-    </style>
+    <div class="col-md-3">
+        <div class="card card-box">
+            <div class="card-body">
+                <h5>New Leads</h5>
+                <h3 id="new_leads">-</h3>
+            </div>
+        </div>
+    </div>
 
-</head>
-<body>
+</div>
 
-<div class="container">
+<div class="mt-4">
 
-    <h1>Sales Dashboard</h1>
+    /api/crm/leads/
+        Manage Leads
+    </a>
 
-    <p>
-        Welcome,
-        <strong>{{ request.user.username }}</strong>
-    </p>
+    /api/quotation/quotations/
+        Manage Quotations
+    </a>
 
-    <ul>
-
-        <li>
-            /api/reports/sales-dashboard/
-                📊 View Sales Dashboard Report
-            </a>
-        </li>
-
-        <li>
-            /api/crm/leads/
-                👥 Manage Leads
-            </a>
-        </li>
-
-        <li>
-            /api/quotation/
-                📄 Manage Quotations
-            </a>
-        </li>
-
-        <li>
-            <a href="/api/customers/">
-                🏢 View Customers
-            </a>
-        </li>
-
-        <li>
-            /dashboard/management/
-                📈 Management Dashboard
-            </a>
-        </li>
-
-    </ul>
-
-    <hr>
-
-    /logout/
-        🚪 Logout
+    /api/reports/sales-dashboard/
+        View Sales API
     </a>
 
 </div>
 
-</body>
-</html>
+<script>
+fetch("/api/reports/sales-dashboard/")
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById("total_leads").innerText = data.total_leads ?? 0;
+        document.getElementById("won_leads").innerText = data.won_leads ?? 0;
+        document.getElementById("lost_leads").innerText = data.lost_leads ?? 0;
+        document.getElementById("new_leads").innerText = data.new_leads ?? 0;
+    })
+    .catch(error => {
+        console.log("Sales dashboard API error", error);
+    });
+</script>
 
+{% endblock %}

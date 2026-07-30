@@ -1,21 +1,73 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Finance Dashboard</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-<h1>Finance Dashboard</h1>
+{% block content %}
 
-<p>Welcome, {{ request.user.username }}</p>
+<h2>Finance Dashboard</h2>
 
-<ul>
-    <li>/api/reports/finance-dashboard/View Finance Dashboard API</a></li>
-    <li>/api/finance/invoices/Invoices</a></li>
-    <li>/api/finance/payments/Payments</a></li>
-</ul>
+<p class="text-muted">
+    Finance team dashboard.
+</p>
 
-/logout/Logout</a>
+<div class="row">
 
-</body>
-</html>
+    <div class="col-md-3">
+        <div class="card card-box">
+            <div class="card-body">
+                <h5>Total Invoices</h5>
+                <h3 id="total_invoices">-</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card card-box">
+            <div class="card-body">
+                <h5>Payments Received</h5>
+                <h3 id="payments_received">-</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card card-box">
+            <div class="card-body">
+                <h5>Paid Invoices</h5>
+                <h3 id="paid_invoices">-</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card card-box">
+            <div class="card-body">
+                <h5>Pending Invoices</h5>
+                <h3 id="pending_invoices">-</h3>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="mt-4">
+
+    /api/finance/invoices/
+        Manage Invoices
+    </a>
+
+    /api/finance/payments/
+        Manage Payments
+    </a>
+
+    /api/reports/finance-dashboard/
+        View Finance API
+    </a>
+
+</div>
+
+<script>
+fetch("/api/reports/finance-dashboard/")
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById("total_invoices").innerText = data.total_invoices ?? 0;
+        document.getElementById("payments_received").innerText = data.payments_received ?? 0;
+        document.getElementById("paid_invoices
