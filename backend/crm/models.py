@@ -2,6 +2,7 @@ from django.db import models
 
 
 class Lead(models.Model):
+
     LEAD_STATUS_CHOICES = [
         ("NEW", "New"),
         ("CONTACTED", "Contacted"),
@@ -20,9 +21,9 @@ class Lead(models.Model):
 
     CUSTOMER_CATEGORY_CHOICES = [
         ("RESIDENTIAL", "Residential"),
+        ("COMMERCIAL", "Commercial"),
         ("INDUSTRIAL", "Industrial"),
         ("AGRICULTURAL", "Agricultural"),
-        ("COMMERCIAL", "Commercial"),
         ("GOVERNMENT", "Government"),
     ]
 
@@ -31,33 +32,63 @@ class Lead(models.Model):
         ("WEBSITE", "Website"),
         ("REFERENCE", "Reference"),
         ("WALK_IN", "Walk In"),
+        ("WHATSAPP", "WhatsApp"),
         ("BROKER", "Broker"),
-        ("EXISTING_CUSTOMER", "Existing Customer"),
-        ("MARKETING_CAMPAIGN", "Marketing Campaign"),
         ("OTHER", "Other"),
     ]
 
-    lead_id = models.CharField(max_length=50, unique=True, blank=True, null=True)
+    lead_id = models.CharField(
+        max_length=50,
+        unique=True,
+        blank=True,
+        null=True
+    )
 
-    customer_name = models.CharField(max_length=200)
-    mobile = models.CharField(max_length=20)
-    alternative_mobile = models.CharField(max_length=20, blank=True, null=True)
-    email = models.EmailField(blank=True, null=True)
+    customer_name = models.CharField(
+        max_length=200
+    )
 
-    location = models.CharField(max_length=255, blank=True, null=True)
-    state = models.CharField(max_length=100, blank=True, null=True)
-    district = models.CharField(max_length=100, blank=True, null=True)
+    mobile = models.CharField(
+        max_length=20
+    )
+
+    alternative_mobile = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True
+    )
+
+    email = models.EmailField(
+        blank=True,
+        null=True
+    )
+
+    location = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True
+    )
+
+    state = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True
+    )
+
+    district = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True
+    )
 
     customer_category = models.CharField(
         max_length=50,
-        choices=CUSTOMER_CATEGORY_CHOICES,
-        default="RESIDENTIAL"
+        choices=CUSTOMER_CATEGORY_CHOICES
     )
 
     project_type = models.CharField(
         max_length=50,
-        choices=PROJECT_TYPE_CHOICES,
-        default="ON_GRID"
+        choices=PROJECT_TYPE_CHOICES
     )
 
     expected_capacity = models.DecimalField(
@@ -72,14 +103,22 @@ class Lead(models.Model):
         default=0
     )
 
+    sales_person = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True
+    )
+
     lead_source = models.CharField(
         max_length=50,
         choices=LEAD_SOURCE_CHOICES,
         default="OTHER"
     )
 
-    reference_name = models.CharField(max_length=200, blank=True, null=True)
-    reference_mobile = models.CharField(max_length=20, blank=True, null=True)
+    follow_up_date = models.DateField(
+        blank=True,
+        null=True
+    )
 
     status = models.CharField(
         max_length=50,
@@ -87,34 +126,49 @@ class Lead(models.Model):
         default="NEW"
     )
 
-    remarks = models.TextField(blank=True, null=True)
+    notes = models.TextField(
+        blank=True,
+        null=True
+    )
 
-    created_by = models.CharField(max_length=100, blank=True, null=True)
-    assigned_to = models.CharField(max_length=100, blank=True, null=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
 
     def save(self, *args, **kwargs):
+
         if not self.lead_id:
-            last_lead = Lead.objects.order_by("-id").first()
-            if last_lead:
-                next_id = last_lead.id + 1
-            else:
-                next_id = 1
-            self.lead_id = f"LEAD{next_id:05d}"
+
+            last_lead = (
+                Lead.objects
+                .order_by("-id")
+                .first()
+            )
+
+            next_id = (
+                last_lead.id + 1
+                if last_lead
+                else 1
+            )
+
+            self.lead_id = (
+                f"LEAD{next_id:05d}"
+            )
+
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.lead_id} - {self.customer_name}"
+        return (
+            f"{self.lead_id} - "
+            f"{self.customer_name}"
+        )
 
 
 class LeadFollowUp(models.Model):
-    FOLLOW_UP_STATUS_CHOICES = [
-        ("OPEN", "Open"),
-        ("COMPLETED", "Completed"),
-        ("CANCELLED", "Cancelled"),
-    ]
 
     lead = models.ForeignKey(
         Lead,
@@ -123,18 +177,19 @@ class LeadFollowUp(models.Model):
     )
 
     followup_date = models.DateField()
-    followup_time = models.TimeField(blank=True, null=True)
 
-    notes = models.TextField()
-    next_action = models.CharField(max_length=255, blank=True, null=True)
+    remarks = models.TextField()
 
-    status = models.CharField(
-        max_length=50,
-        choices=FOLLOW_UP_STATUS_CHOICES,
-        default="OPEN"
+    next_followup_date = models.DateField(
+        blank=True,
+        null=True
     )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
 
     def __str__(self):
-        return f"{self.lead.lead_id} - {self.followup_date}"
+        return (
+            f"{self.lead.lead_id}"
+        )
