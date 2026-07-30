@@ -1,38 +1,127 @@
 from django.db import models
+
 from projects.models import Project
 
 
 class Technician(models.Model):
-    employee_id = models.CharField(max_length=50, unique=True)
-    name = models.CharField(max_length=200)
-    mobile = models.CharField(max_length=20)
-    email = models.EmailField(blank=True, null=True)
-    region = models.CharField(max_length=100, blank=True, null=True)
-    active = models.BooleanField(default=True)
+
+    technician_code = models.CharField(
+        max_length=50,
+        unique=True
+    )
+
+    technician_name = models.CharField(
+        max_length=255
+    )
+
+    mobile = models.CharField(
+        max_length=20
+    )
+
+    location = models.CharField(
+        max_length=255
+    )
+
+    active = models.BooleanField(
+        default=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def save(self, *args, **kwargs):
+
+        if not self.technician_code:
+
+            last_tech = (
+                Technician.objects
+                .order_by("-id")
+                .first()
+            )
+
+            next_id = (
+                last_tech.id + 1
+                if last_tech
+                else 1
+            )
+
+            self.technician_code = (
+                f"TECH{next_id:05d}"
+            )
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.name
+        return (
+            f"{self.technician_code} - "
+            f"{self.technician_name}"
+        )
 
 
-class ProjectAssignment(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="technician_assignments")
-    technician = models.ForeignKey(Technician, on_delete=models.CASCADE, related_name="assignments")
-    assigned_date = models.DateField(auto_now_add=True)
+class WorkOrder(models.Model):
+
+    STATUS_CHOICES = [
+        ("ASSIGNED", "Assigned"),
+        ("IN_PROGRESS", "In Progress"),
+        ("ON_HOLD", "On Hold"),
+        ("COMPLETED", "Completed"),
+    ]
+
+    work_order_number = models.CharField(
+        max_length=50,
+        unique=True
+    )
+
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE
+    )
+
+    technician = models.ForeignKey(
+        Technician,
+        on_delete=models.CASCADE
+    )
+
+    status = models.CharField(
+        max_length=50,
+        choices=STATUS_CHOICES,
+        default="ASSIGNED"
+    )
+
+    assigned_date = models.DateField()
+
+    completion_date = models.DateField(
+        null=True,
+        blank=True
+    )
+
+    remarks = models.TextField(
+        null=True,
+        blank=True
+    )
+
+    def save(self, *args, **kwargs):
+
+        if not self.work_order_number:
+
+            last_wo = (
+                WorkOrder.objects
+                .order_by("-id")
+                .first()
+            )
+
+            next_id = (
+                last_wo.id + 1
+                if last_wo
+                else 1
+            )
+
+            self.work_order_number = (
+                f"WO{next_id:05d}"
+            )
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.project.project_id} - {self.technician.name}"
-
-
-class ProjectUpdate(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="updates")
-    technician = models.ForeignKey(Technician, on_delete=models.SET_NULL, null=True, blank=True)
-    update_date = models.DateField(auto_now_add=True)
-    structure_installed = models.BooleanField(default=False)
-    panels_installed = models.BooleanField(default=False)
-    inverter_installed = models.BooleanField(default=False)
-    wiring_completed = models.BooleanField(default=False)
-    earthing_completed = models.BooleanField(default=False)
-    comments = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.project.project_id} - {self.update_date}"
+        return self.work_order_number
