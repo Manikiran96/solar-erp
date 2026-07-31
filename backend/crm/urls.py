@@ -1,16 +1,14 @@
-from django.urls import (
-    path,
-    include
-)
+from django.urls import path, include
 
-from rest_framework.routers import (
-    DefaultRouter
-)
+from rest_framework.routers import DefaultRouter
 
 from .views import (
     LeadViewSet,
-    LeadFollowUpViewSet
+    LeadFollowUpViewSet,
+    ConvertedLeadViewSet,
+    LostLeadViewSet
 )
+
 
 router = DefaultRouter()
 
@@ -26,9 +24,22 @@ router.register(
     basename="followups"
 )
 
+router.register(
+    "converted-leads",
+    ConvertedLeadViewSet,
+    basename="converted-leads"
+)
+
+router.register(
+    "lost-leads",
+    LostLeadViewSet,
+    basename="lost-leads"
+)
+
+
 urlpatterns = [
     path(
         "",
         include(router.urls)
-    )
+    ),
 ]
